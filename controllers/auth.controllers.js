@@ -1,6 +1,9 @@
 const createError = require("http-errors");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const { User } = require("../models/user");
+
+const { SECRET_KEY } = process.env;
 
 async function register(req, res, next) {
   const { login, password } = req.body;
@@ -31,11 +34,24 @@ async function login(req, res, next) {
     return next(createError(401, "Email or password is wrong"));
   }
 
+  const payload = {
+    id: storedUser._id,
+  };
+
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "3h" });
+  await User.findByIdAndUpdate(storedUser._id, { token });
+
   return res.json({
     data: {
-      token: "token",
+      token,
     },
   });
 }
 
-module.exports = { register, login };
+async function logout(req, res, next) {
+  const { _id } = req.user;
+  await User.findByIdAndUpdate(_id, { token: null });
+  res.status(204).json();
+}
+
+module.exports = { register, login, logout };
