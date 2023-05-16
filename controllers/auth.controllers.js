@@ -23,13 +23,11 @@ async function register(req, res, next) {
     const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "3h" });
     await User.findByIdAndUpdate(newUser._id, { token });
 
-    res
-      .status(201)
-      .json({
-        message: "Created user",
-        user: { login, id: newUser._id },
-        token,
-      });
+    res.status(201).json({
+      message: "User created",
+      user: { login, id: newUser._id },
+      token,
+    });
   } catch (error) {
     if (error.message.includes("E11000 duplicate key error collection")) {
       return next(createError(409, `User with email '${login}' already exist`));
@@ -54,9 +52,9 @@ async function login(req, res, next) {
   await User.findByIdAndUpdate(storedUser._id, { token });
 
   return res.json({
-    data: {
-      token,
-    },
+    message: "Гser is logged in",
+    user: { login, id: storedUser._id },
+    token,
   });
 }
 
