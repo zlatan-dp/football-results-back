@@ -52,7 +52,7 @@ async function login(req, res, next) {
   await User.findByIdAndUpdate(storedUser._id, { token });
 
   return res.json({
-    message: "Гser is logged in",
+    message: "User is logged in",
     user: { login, id: storedUser._id },
     token,
   });
